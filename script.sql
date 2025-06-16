@@ -9,3 +9,17 @@ ADD COLUMN ativo BOOLEAN DEFAULT TRUE;
 -- 1.2 Associe um trigger de DELETE à tabela. Quando um DELETE for executado, o trigger
 -- deve atribuir FALSE à coluna ativo das linhas envolvidas. Além disso, o trigger não deve
 -- permitir que nenhuma pessoa seja removida.
+CREATE OR REPLACE FUNCTION fn_atribui_false_ao_delete()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE tb_pessoa SET ativo = FALSE
+    WHERE cod_pessoa = OLD.cod_pessoa;
+    RETURN NULL;
+END;
+$$
+
+CREATE OR REPLACE TRIGGER tg_atribui_false_ao_delete BEFORE DELETE ON tb_pessoa
+FOR EACH ROW
+EXECUTE FUNCTION fn_atribui_false_ao_delete();
